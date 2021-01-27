@@ -25,29 +25,37 @@ function amountFor(aperformance) {
     }
     return result;
 }
+function volumeCreditsFor(aPerformance) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if ("comedy" === playFor(aPerformance).type) {
+        result += Math.floor(aPerformance.audience / 5);
+    }
+    return result;
+}
+//6.改变 format 函数命名
+function usd(aNumber) {
+    return new Intl.NumberFormat("en-US",
+        {
+            style: "currency", currency: "USD",
+            minimumFractionDigits: 2
+        }).format(aNumber / 100);
+}
+
 //5. 内联变量手法内联 play,thisAmount 变量，减少局部变量
 function statement(invoice, plays) {
     let totalAmount = 0;
     let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
-    const format = new Intl.NumberFormat("en-US",
-        {
-            style: "currency", currency: "USD",
-            minimumFractionDigits: 2
-        }).format;
-    for (let perf of invoice.performances) {
-        //const play = playFor(perf);
-        // let thisAmount = amountFor(perf, play);
 
-        // add volume credits
-        volumeCredits += Math.max(perf.audience - 30, 0);
-        // add extra credit for every ten comedy attendees
-        if ("comedy" === playfor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
+    for (let perf of invoice.performances) {
+        volumeCredits += volumeCreditsFor(perf);
+
         // print line for this order
-        result += ` ${playfor(perf).name}: ${format(amountFor(perf, playfor(perf)) / 100)} (${perf.audience} seats)\n`;
+        result += ` ${playfor(perf).name}: ${usd(amountFor(perf, playfor(perf)) / 100)} (${perf.audience} seats)\n`;
         totalAmount += amountFor(perf, playfor(perf));
     }
-    result += `Amount owed is ${format(totalAmount / 100)}\n`;
+    result += `Amount owed is ${usd(totalAmount / 100)}\n`;
     result += `You earned ${volumeCredits} credits\n`;
     return result;
 }
