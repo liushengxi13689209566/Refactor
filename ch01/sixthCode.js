@@ -1,4 +1,3 @@
-
 //4.以查询取代临时变量
 function playFor(aPerformance) {
     return plays[aPerformance.playID];
@@ -41,20 +40,37 @@ function usd(aNumber) {
             minimumFractionDigits: 2
         }).format(aNumber / 100);
 }
-
+//计算过程应用提炼函数 (106)手法。
+function totalVolumeCredits() {
+    let volumeCredits = 0;
+    for (let perf of invoice.performances) {
+        volumeCredits += volumeCreditsFor(perf);
+    }
+    return volumeCredits;
+}
 //5. 内联变量手法内联 play,thisAmount 变量，减少局部变量
 function statement(invoice, plays) {
     let totalAmount = 0;
-    let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
 
+    //7.拆分循环
+    for (let perf of invoice.performances) {
+        // print line for this order
+        result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
+        totalAmount += amountFor(perf);
+    }
+    //8.移动变量语句(223)手法
+    let volumeCredits = 0;
     for (let perf of invoice.performances) {
         volumeCredits += volumeCreditsFor(perf);
-
-        // print line for this order
-        result += ` ${playfor(perf).name}: ${usd(amountFor(perf, playfor(perf)) / 100)} (${perf.audience} seats)\n`;
-        totalAmount += amountFor(perf, playfor(perf));
     }
+    // for (let perf of invoice.performances) {
+    //     volumeCredits += volumeCreditsFor(perf);
+
+    //     // print line for this order
+    //     result += ` ${playfor(perf).name}: ${usd(amountFor(perf, playfor(perf)) / 100)} (${perf.audience} seats)\n`;
+    //     totalAmount += amountFor(perf, playfor(perf));
+    // }
     result += `Amount owed is ${usd(totalAmount / 100)}\n`;
     result += `You earned ${volumeCredits} credits\n`;
     return result;
